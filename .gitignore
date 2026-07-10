@@ -1,0 +1,7 @@
+dist
+build
+gui.spec
+venv
+__pycache__/
+*.pyc   
+*.zip

@@ -4,16 +4,19 @@ from anim import show
 import io
 import os
 import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) #(add path for module searching(normalize path ((script directory of(current file path))+/..)))
 from util.utils import LSBcrypt, LSBdecrypt
+
+if getattr(sys, 'frozen', False):
+    base_path = os.path.dirname(sys.executable)
+    icon = os.path.join(base_path, 'icons', 'logo.ico')
+else:
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    project_dir = os.path.dirname(base_path)
+    icon = os.path.join(project_dir, 'icons', 'logo.ico')
 
 show()
 user = os.path.expanduser('~')
-script_dir = os.path.dirname(__file__)
-project_dir = os.path.dirname(script_dir)
-icon = os.path.join(project_dir, 'icons', 'logo.ico')
 gui.theme('DarkGrey12')
-#gui.theme_previewer()
 COLOR = "#313641"
 
 # paint png canvas, avoid creating file
