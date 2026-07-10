@@ -4,16 +4,19 @@ from anim import show
 import io
 import os
 import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) #(add path for module searching(normalize path ((script directory of(current file path))+/..)))
 from util.utils import LSBcrypt, LSBdecrypt
 
 show()
 user = os.path.expanduser('~')
 script_dir = os.path.dirname(__file__)
-icon = os.path.join(script_dir, 'icons', 'logo.ico')
+project_dir = os.path.dirname(script_dir)
+icon = os.path.join(project_dir, 'icons', 'logo.ico')
 gui.theme('DarkGrey12')
 #gui.theme_previewer()
 COLOR = "#313641"
+
+# paint png canvas, avoid creating file
 
 def load_orig(filename=None, max_size=(400, 400), color=COLOR):
     try:
@@ -32,6 +35,7 @@ def load_orig(filename=None, max_size=(400, 400), color=COLOR):
         gui.popup_error(f"Error processing image asset: {e}")
         return load_orig(filename=None, max_size=max_size, color=color) if filename else None
 
+# ORIG + ENC
 image_row = [
     gui.Column([
         [gui.Text("Original Image:")],
@@ -44,6 +48,7 @@ image_row = [
     ], size=(410, 430), pad=(10,10),element_justification='center', vertical_alignment='center')
 ]
 
+# MAIN LY
 layout = [
     [gui.Frame("Image Setup", [
         [
@@ -65,6 +70,7 @@ layout = [
 
 window = gui.Window("Steganosaurus by ic3dust", layout, icon=icon)
 
+# ENCRYPTION WINDOW
 def msg_window():
     global embedded
     msg_window_layout=[
@@ -93,6 +99,7 @@ def msg_window():
     msg_window_gui.close()
     return message
 
+# DECRYPTION WINDOW
 def decrypt_window(window, initial_path=""):
     decrypt_window_layout = [
         [gui.Text("Select the image to decrypt...")],
@@ -146,46 +153,39 @@ while True:
 
             img_data=load_orig(filename)
             if img_data is not None:
-
                 window['-CONT-'].update(data=img_data)
                 window['-E-'].update(visible=True)
                 window['-D-'].update(visible=True)
     if event == '-E-':
         while True:
-
             secret_msg = msg_window()
             if not secret_msg or not embedded:
                 break
-            
             save_layout = [
                 [gui.Text("Choose where to save your encrypted image:")],
                 [gui.Input(key='-SAVE_FOLDER-'), gui.FileSaveAs('Browse', file_types=(("PNG Image", "*.png"),), initial_folder=user)],
                 [gui.Button('Save', key='-SAVE_BTN-'), gui.Button('Back', key='-BACK_BTN-')]
             ]
 
+            # SAVE WINDOW
             save_gui = gui.Window("Save encrypted image as...", save_layout, modal=True, finalize=True)
             save_gui['-SAVE_FOLDER-'].set_focus()
-
             back= False
             save_path = None
 
             while True:
-
                 save_event, save_values = save_gui.read()
                 if save_event == gui.WIN_CLOSED:
                     break
-                    
                 if save_event == '-BACK_BTN-':
                     back = True
                     break
-                    
                 if save_event == '-SAVE_BTN-':
                     save_path = save_values['-SAVE_FOLDER-'].strip()
                     if not save_path:
                         gui.popup_error("Please select a file path!")
                         continue
                     break
-            
             save_gui.close() 
 
             if back:
@@ -216,5 +216,3 @@ while True:
                 gui.popup_error("Please choose a file first!")
 
 window.close()
-
-# WAIT FOR COMMENTS IN UPCOMING COMMITS AND README UPDATE 
